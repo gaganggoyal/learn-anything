@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Learn Anything — with Buddy, your friendly teacher</title>
+<meta name="theme-color" content="#ff8e3c">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/static/icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Buddy">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #fef6e4;
+    --card: #ffffff;
+    --ink: #33272a;
+    --muted: #7a6f72;
+    --accent: #ff8e3c;
+    --accent-dark: #e97c2b;
+    --blue: #3da9fc;
+    --blue-soft: #e3f2fe;
+    --green: #2cb67d;
+    --red: #ef4565;
+    --line: #f0e4d0;
+    --radius: 18px;
+  }
+  body {
+    font-family: -apple-system, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+    background: linear-gradient(160deg, #fef6e4 0%, #fde8d7 55%, #e3f2fe 100%);
+    min-height: 100vh;
+    color: var(--ink);
+  }
+  .app { max-width: 1280px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column;
+         height: 100vh; height: 100dvh; }
+
+  /* ---------- header ---------- */
+  header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 10px 18px; margin-bottom: 14px;
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: 0 4px 18px rgba(51,39,42,.07);
+  }
+  .btn.menu-btn { display: none; }
+  .logo { font-size: 2.1rem; line-height: 1; }
+  .brand h1 { font-size: 1.25rem; letter-spacing: .3px; }
+  .brand p { font-size: .8rem; color: var(--muted); }
+  .status { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: .82rem; color: var(--muted);
+            background: #faf5ec; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #c9c1b2; }
+  .dot.on  { background: var(--green); box-shadow: 0 0 0 4px rgba(44,182,125,.15); }
+  .dot.off { background: var(--red);   box-shadow: 0 0 0 4px rgba(239,69,101,.15); }
+
+  /* ---------- layout ---------- */
+  .main { display: flex; gap: 14px; flex: 1; min-height: 0; }
+  aside {
+    width: 350px; flex-shrink: 0; overflow-y: auto;
+    background: var(--card); border-radius: var(--radius); padding: 18px;
+    box-shadow: 0 4px 18px rgba(51,39,42,.07);
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .drawer-head { display: none; }
+  .backdrop { display: none; position: fixed; inset: 0; background: rgba(51,39,42,.45); z-index: 40; }
+  section.chat {
+    flex: 1; min-width: 0; display: flex; flex-direction: column;
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: 0 4px 18px rgba(51,39,42,.07); overflow: hidden;
+  }
+
+  /* ---------- sidebar controls ---------- */
+  .control label { display: block; font-size: .78rem; font-weight: 700; text-transform: uppercase;
+                   letter-spacing: .6px; color: var(--muted); margin-bottom: 7px; }
+  select, input[type=text] {
+    width: 100%; padding: 11px 12px; font-size: .95rem; font-family: inherit; color: var(--ink);
+    border: 2px solid var(--line); border-radius: 12px; background: #fffdf8; outline: none;
+    transition: border-color .15s;
+  }
+  select:focus, input[type=text]:focus { border-color: var(--accent); }
+  select { cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a6f72' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center; }
+  .custom-subject { display: none; margin-top: 8px; gap: 6px; }
+  .custom-subject.show { display: flex; }
+  .custom-subject input { flex: 1; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 11px 14px; font-size: .95rem; font-weight: 700; font-family: inherit;
+    border: none; border-radius: 12px; cursor: pointer; transition: transform .1s, filter .15s;
+    color: #fff; background: var(--accent); width: 100%;
+  }
+  .btn:hover { filter: brightness(1.06); }
+  .btn:active { transform: scale(.97); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+  .btn.blue { background: var(--blue); }
+  .btn.ghost { background: #f6efe2; color: var(--ink); }
+  .btn.small { width: auto; padding: 9px 13px; font-size: .85rem; }
+
+  /* upload zone */
+  .dropzone {
+    border: 2.5px dashed #e5cfa8; border-radius: 14px; padding: 20px 12px;
+    text-align: center; cursor: pointer; background: #fffaf0; transition: all .15s;
+  }
+  .dropzone:hover, .dropzone.drag { border-color: var(--accent); background: #fff3e2; }
+  .dropzone .big { font-size: 1.7rem; }
+  .dropzone p { font-size: .85rem; color: var(--muted); margin-top: 6px; }
+  .dropzone p b { color: var(--accent-dark); }
+  .book-card {
+    display: none; background: var(--blue-soft); border-radius: 14px; padding: 12px 14px;
+    font-size: .87rem; line-height: 1.45;
+  }
+  .book-card.show { display: block; }
+  .book-card .name { font-weight: 800; word-break: break-all; }
+  .book-card .meta { color: #4a6a83; font-size: .8rem; margin: 4px 0 10px; }
+  .book-actions { display: flex; gap: 8px; }
+  .divider { border: none; border-top: 2px solid var(--line); }
+
+  /* ---------- chat ---------- */
+  .messages { flex: 1; overflow-y: auto; padding: 22px 22px 10px; display: flex; flex-direction: column; gap: 14px; }
+  .msg { display: flex; gap: 10px; max-width: 85%; animation: pop .18s ease-out; }
+  @keyframes pop { from { opacity: 0; transform: translateY(6px); } }
+  .msg .avatar { font-size: 1.5rem; width: 42px; height: 42px; flex-shrink: 0;
+                 display: flex; align-items: center; justify-content: center;
+                 background: #fff3e2; border-radius: 50%; box-shadow: 0 2px 6px rgba(51,39,42,.08); }
+  .msg .bubble { padding: 12px 16px; border-radius: 16px; font-size: .97rem; line-height: 1.55;
+                 white-space: pre-wrap; word-wrap: break-word; }
+  .msg.buddy .bubble { background: #fff8ec; border: 1.5px solid #f5e5c8; border-top-left-radius: 4px; }
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+  .msg.user .avatar { background: var(--blue-soft); }
+  .msg.user .bubble { background: var(--blue); color: #fff; border-top-right-radius: 4px; }
+  .msg.note { align-self: center; max-width: 95%; }
+  .msg.note .bubble { background: #f2f7f2; border: 1.5px dashed #bcd9c6; color: #3c6e50;
+                      font-size: .84rem; border-radius: 12px; text-align: center; }
+  .bubble b { font-weight: 800; } .bubble i { font-style: italic; }
+  .bubble code { background: rgba(0,0,0,.07); border-radius: 5px; padding: 1px 5px; font-size: .88em; }
+  .typing span { display: inline-block; width: 7px; height: 7px; margin-right: 4px;
+                 background: #d9b88a; border-radius: 50%; animation: blink 1.2s infinite; }
+  .typing span:nth-child(2) { animation-delay: .2s; } .typing span:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%,80%,100% { opacity: .25; } 40% { opacity: 1; } }
+
+  .chips { display: flex; gap: 8px; padding: 6px 22px 10px; flex-wrap: wrap; }
+  .chip { border: 1.5px solid var(--line); background: #fffdf8; color: var(--ink); font-family: inherit;
+          border-radius: 999px; padding: 7px 14px; font-size: .82rem; cursor: pointer; transition: all .15s;
+          white-space: nowrap; }
+  .chip:hover { border-color: var(--accent); background: #fff3e2; }
+
+  .composer { display: flex; gap: 10px; padding: 14px 18px 18px; border-top: 2px solid var(--line); }
+  .composer input {
+    flex: 1; padding: 14px 16px; font-size: 1rem; font-family: inherit;
+    border: 2px solid var(--line); border-radius: 14px; outline: none; background: #fffdf8;
+  }
+  .composer input:focus { border-color: var(--blue); }
+  .composer .btn { width: auto; padding: 0 22px; font-size: 1.15rem; }
+
+  /* offline banner */
+  .banner { display: none; background: #fdecef; color: #a12744; border: 1.5px solid #f6c6d0;
+            border-radius: 12px; padding: 10px 14px; font-size: .86rem; margin-bottom: 12px; }
+  .banner.show { display: block; }
+  .banner code { background: rgba(0,0,0,.06); padding: 1px 6px; border-radius: 5px; }
+
+  /* ---------- mobile: chat fills the screen, sidebar becomes a drawer ---------- */
+  @media (max-width: 820px) {
+    .app { padding: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+    header { padding: 8px 12px; margin-bottom: 10px; gap: 10px; }
+    .btn.menu-btn { display: inline-flex; width: auto; padding: 9px 13px; font-size: 1.15rem; }
+    .logo { font-size: 1.7rem; }
+    .brand h1 { font-size: 1.05rem; }
+    .brand p { display: none; }
+    .status .label { display: none; }
+
+    aside {
+      position: fixed; top: 0; left: 0; bottom: 0; z-index: 50;
+      width: min(85vw, 340px); border-radius: 0 var(--radius) var(--radius) 0;
+      transform: translateX(-110%); transition: transform .25s ease;
+      padding-bottom: calc(18px + env(safe-area-inset-bottom));
+    }
+    aside.open { transform: none; box-shadow: 8px 0 40px rgba(51,39,42,.25); }
+    .backdrop.show { display: block; }
+    .drawer-head { display: flex; align-items: center; justify-content: space-between; }
+    .drawer-head b { font-size: 1rem; }
+    .drawer-head .btn { width: auto; padding: 7px 12px; }
+
+    section.chat { border-radius: 14px; }
+    .messages { padding: 14px 12px 8px; gap: 11px; }
+    .msg { max-width: 94%; }
+    .msg .avatar { width: 34px; height: 34px; font-size: 1.2rem; }
+    .msg .bubble { padding: 10px 13px; font-size: .94rem; }
+
+    /* one scrollable row of chips instead of a tall pile */
+    .chips { flex-wrap: nowrap; overflow-x: auto; padding: 6px 12px 8px; -webkit-overflow-scrolling: touch;
+             scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+
+    .composer { padding: 10px 10px calc(12px + env(safe-area-inset-bottom)); }
+    /* 16px inputs stop iOS Safari from zooming in on focus */
+    select, input[type=text], .composer input { font-size: 16px; }
+    .btn { min-height: 44px; }
+    .composer .btn { padding: 0 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <button class="btn ghost menu-btn" id="menuBtn" title="Lesson settings">⚙️</button>
+    <div class="logo">🧸</div>
+    <div class="brand">
+      <h1>Learn Anything</h1>
+      <p>with Buddy, your friendly offline teacher</p>
+    </div>
+    <div class="status"><div class="dot" id="statusDot"></div><span class="label" id="statusLabel">Checking…</span></div>
+  </header>
+
+  <div class="banner" id="offlineBanner">
+    😴 Buddy's brain isn't running. On the teacher's computer, start it with
+    <code>ollama serve</code> and refresh this page.
+  </div>
+
+  <div class="main">
+    <div class="backdrop" id="backdrop"></div>
+    <aside id="sidebar">
+      <div class="drawer-head">
+        <b>⚙️ My lesson</b>
+        <button class="btn ghost" id="drawerClose">✖</button>
+      </div>
+
+      <div class="control">
+        <label for="gradeSel">🎓 Class</label>
+        <select id="gradeSel">
+          <option value="preschool">Preschool / KG</option>
+          <option value="class-1">Class 1</option>
+          <option value="class-2">Class 2</option>
+          <option value="class-3">Class 3</option>
+          <option value="class-4" selected>Class 4</option>
+          <option value="class-5">Class 5</option>
+          <option value="class-6">Class 6</option>
+          <option value="class-7">Class 7</option>
+          <option value="class-8">Class 8</option>
+          <option value="class-9">Class 9</option>
+          <option value="class-10">Class 10</option>
+          <option value="class-11">Class 11</option>
+          <option value="class-12">Class 12</option>
+        </select>
+      </div>
+
+      <div class="control">
+        <label for="subjectSel">📚 Subject</label>
+        <select id="subjectSel">
+          <option value="science">Science</option>
+          <option value="maths">Maths</option>
+          <option value="english">English</option>
+          <option value="social studies and the world around us">Social Studies / EVS</option>
+          <option value="general knowledge">General Knowledge</option>
+          <option value="space and the planets">Space 🚀</option>
+          <option value="animals and nature">Animals 🦁</option>
+          <option value="fun stories">Story Time 📖</option>
+          <option value="__custom__">Something else…</option>
+        </select>
+        <div class="custom-subject" id="customWrap">
+          <input type="text" id="customSubject" placeholder="e.g. dinosaurs" maxlength="60">
+          <button class="btn small blue" id="setSubjectBtn">Set</button>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="control">
+        <label>📖 Learn from your own book</label>
+        <div class="dropzone" id="dropzone">
+          <div class="big">📄</div>
+          <p><b>Click</b> or drop a PDF here<br>(textbook, notes, a story…)</p>
+        </div>
+        <input type="file" id="fileInput" accept=".pdf,application/pdf" hidden>
+        <div class="book-card" id="bookCard">
+          <div class="name" id="bookName"></div>
+          <div class="meta" id="bookMeta"></div>
+          <button class="btn" id="lessonBtn" style="margin-bottom:8px">▶ Continue lesson</button>
+          <div class="book-actions">
+            <button class="btn small blue" id="trailerBtn">🎬 Book trailer</button>
+            <button class="btn small ghost" id="closeBookBtn">✖ Close book</button>
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <button class="btn" id="quizBtn">🎯 Quiz me!</button>
+      <button class="btn ghost" id="newLessonBtn">🔄 New lesson</button>
+    </aside>
+
+    <section class="chat">
+      <div class="messages" id="messages"></div>
+      <div class="chips" id="chips">
+        <button class="chip">Explain it with a fun example 🎈</button>
+        <button class="chip">Tell me something amazing! ✨</button>
+        <button class="chip">Can you say that more simply?</button>
+      </div>
+      <div class="composer">
+        <input type="text" id="chatInput" placeholder="Ask Buddy anything…" autocomplete="off" maxlength="500">
+        <button class="btn" id="sendBtn" title="Send">➤</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const state = { sessionId: null, busy: false, hasPdf: false, online: false };
+const isPhone = () => window.matchMedia("(max-width: 820px)").matches;
+
+/* ---------- mobile drawer ---------- */
+function openDrawer()  { $("sidebar").classList.add("open");    $("backdrop").classList.add("show"); }
+function closeDrawer() { $("sidebar").classList.remove("open"); $("backdrop").classList.remove("show"); }
+$("menuBtn").onclick = openDrawer;
+$("drawerClose").onclick = closeDrawer;
+$("backdrop").onclick = closeDrawer;
+const closeDrawerOnPhone = () => { if (isPhone()) closeDrawer(); };
+
+/* ---------- tiny safe markdown ---------- */
+function render(text) {
+  let h = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  h = h.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+  h = h.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<i>$2</i>");
+  h = h.replace(/`([^`\n]+)`/g, "<code>$1</code>");
+  return h;
+}
+
+/* ---------- chat bubbles ---------- */
+function addMsg(kind, html) {
+  const wrap = document.createElement("div");
+  wrap.className = "msg " + kind;
+  const avatar = kind === "buddy" ? "🧸" : kind === "user" ? "🙋" : "";
+  wrap.innerHTML = (avatar ? `<div class="avatar">${avatar}</div>` : "") +
+                   `<div class="bubble">${html}</div>`;
+  $("messages").appendChild(wrap);
+  $("messages").scrollTop = $("messages").scrollHeight;
+  return wrap.querySelector(".bubble");
+}
+const note = text => addMsg("note", render(text));
+
+/* ---------- session ---------- */
+function currentSubject() {
+  const sel = $("subjectSel").value;
+  if (sel === "__custom__") return $("customSubject").value.trim() || "anything you're curious about";
+  return sel;
+}
+
+async function newSession() {
+  const res = await fetch("/api/session", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ subject: currentSubject(), grade: $("gradeSel").value })
+  });
+  const d = await res.json();
+  state.sessionId = d.session_id;
+}
+
+async function pushSettings() {
+  if (!state.sessionId) return;
+  await fetch("/api/settings", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ session_id: state.sessionId, subject: currentSubject(),
+                           grade: $("gradeSel").value })
+  }).catch(() => {});
+}
+
+/* ---------- talking to Buddy ---------- */
+async function send(text, action = "chat") {
+  if (state.busy || !state.sessionId) return;
+  state.busy = true;
+  closeDrawerOnPhone();
+  $("sendBtn").disabled = $("quizBtn").disabled = $("trailerBtn").disabled = $("lessonBtn").disabled = true;
+
+  if (action === "chat") addMsg("user", render(text));
+  else if (action === "quiz") addMsg("user", "🎯 Quiz me!");
+  else if (action === "overview") addMsg("user", "🎬 What is my book about?");
+  else if (action === "lesson") addMsg("user", "▶ Teach me the next part!");
+
+  const bubble = addMsg("buddy", '<span class="typing"><span></span><span></span><span></span></span>');
+  bubble.classList.add("typing-holder");
+
+  try {
+    let res = await fetch("/api/chat", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_id: state.sessionId, message: text, action })
+    });
+    if (res.status === 404) {           // session expired on the server: make a new one, retry once
+      await newSession();
+      if (state.hasPdf) { state.hasPdf = false; $("bookCard").classList.remove("show"); note("Your book was closed because the lesson restarted. Upload it again to keep reading! 📖"); }
+      res = await fetch("/api/chat", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: state.sessionId, message: text, action })
+      });
+    }
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      bubble.innerHTML = render("😕 " + (err.detail || "Something went wrong."));
+      return;
+    }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let full = "";
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      full += decoder.decode(value, { stream: true });
+      bubble.innerHTML = render(full);
+      $("messages").scrollTop = $("messages").scrollHeight;
+    }
+    if (!full.trim()) bubble.innerHTML = render("😕 I didn't get an answer. Is Buddy's brain running?");
+  } catch (e) {
+    bubble.innerHTML = render("😕 I couldn't reach the teacher's computer. Is the server running?");
+  } finally {
+    state.busy = false;
+    $("sendBtn").disabled = $("quizBtn").disabled = false;
+    $("trailerBtn").disabled = $("lessonBtn").disabled = !state.hasPdf;
+    if (!isPhone()) $("chatInput").focus();
+  }
+}
+
+function sendFromInput() {
+  const text = $("chatInput").value.trim();
+  if (!text) return;
+  $("chatInput").value = "";
+  send(text);
+}
+
+/* ---------- PDF upload ---------- */
+async function uploadPdf(file) {
+  if (!file || state.busy) return;
+  if (!file.name.toLowerCase().endsWith(".pdf")) { note("Oops — Buddy can only read PDF files. 📄"); return; }
+  closeDrawerOnPhone();
+  note(`📖 Buddy is reading “${file.name}”… one moment!`);
+  const form = new FormData();
+  form.append("session_id", state.sessionId);
+  form.append("file", file);
+  try {
+    const res = await fetch("/api/upload", { method: "POST", body: form });
+    const d = await res.json();
+    if (!res.ok) { note("😕 " + (d.detail || "Couldn't read that book.")); return; }
+    state.hasPdf = true;
+    $("bookName").textContent = "📕 " + d.name;
+    $("bookMeta").textContent = `${d.pages} page${d.pages === 1 ? "" : "s"} · ${d.mode}`;
+    $("bookCard").classList.add("show");
+    $("trailerBtn").disabled = $("lessonBtn").disabled = false;
+    note(`Book loaded! Buddy will teach from “${d.name}” first, and will always tell you when an answer comes from outside it.`);
+    send("", "overview");
+  } catch {
+    note("😕 Upload failed. Is the server running?");
+  }
+}
+
+/* ---------- boot ---------- */
+async function init() {
+  try {
+    const d = await (await fetch("/api/health")).json();
+    state.online = d.ok;
+    $("statusDot").className = "dot " + (d.ok ? "on" : "off");
+    $("statusLabel").textContent = d.ok ? "Buddy is ready" : "Buddy is asleep";
+    $("offlineBanner").classList.toggle("show", !d.ok);
+  } catch {
+    $("statusDot").className = "dot off";
+    $("statusLabel").textContent = "Server error";
+  }
+  await newSession();
+  addMsg("buddy", render(
+    "Hi friend! I'm **Buddy**, your teacher for today! 🌟\n\n" +
+    "Pick your **class** and a **subject** (tap **⚙️** on a phone — it's on the left on a computer), " +
+    "or upload your own **book (PDF)** and I'll teach from it. Then ask me anything — or press **🎯 Quiz me!**"));
+  if (!isPhone()) $("chatInput").focus();
+}
+
+/* offline-first: the app shell installs itself so the page opens instantly next time */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));
+}
+
+/* ---------- wiring ---------- */
+$("sendBtn").onclick = sendFromInput;
+$("chatInput").addEventListener("keydown", e => { if (e.key === "Enter") sendFromInput(); });
+$("quizBtn").onclick = () => send("", "quiz");
+$("trailerBtn").onclick = () => send("", "overview");
+$("lessonBtn").onclick = () => send("", "lesson");
+$("gradeSel").onchange = () => { pushSettings(); closeDrawerOnPhone(); };
+$("subjectSel").onchange = () => {
+  const custom = $("subjectSel").value === "__custom__";
+  $("customWrap").classList.toggle("show", custom);
+  if (!custom) { pushSettings(); note(`🎨 New subject: ${$("subjectSel").options[$("subjectSel").selectedIndex].text}. Ask away!`); closeDrawerOnPhone(); }
+  else $("customSubject").focus();
+};
+$("setSubjectBtn").onclick = () => {
+  if (!$("customSubject").value.trim()) return;
+  pushSettings(); note(`🎨 New subject: ${$("customSubject").value.trim()}. Ask away!`);
+  closeDrawerOnPhone();
+};
+$("customSubject").addEventListener("keydown", e => { if (e.key === "Enter") $("setSubjectBtn").click(); });
+
+$("dropzone").onclick = () => $("fileInput").click();
+$("fileInput").onchange = () => { uploadPdf($("fileInput").files[0]); $("fileInput").value = ""; };
+["dragover", "dragenter"].forEach(ev => $("dropzone").addEventListener(ev, e => { e.preventDefault(); $("dropzone").classList.add("drag"); }));
+["dragleave", "drop"].forEach(ev => $("dropzone").addEventListener(ev, e => { e.preventDefault(); $("dropzone").classList.remove("drag"); }));
+$("dropzone").addEventListener("drop", e => uploadPdf(e.dataTransfer.files[0]));
+
+$("closeBookBtn").onclick = async () => {
+  await fetch("/api/close-pdf", { method: "POST", headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ session_id: state.sessionId }) }).catch(() => {});
+  state.hasPdf = false;
+  $("bookCard").classList.remove("show");
+  $("trailerBtn").disabled = $("lessonBtn").disabled = true;
+  note("📚 Book closed! Buddy is back to using his own knowledge.");
+};
+
+$("newLessonBtn").onclick = async () => {
+  $("messages").innerHTML = "";
+  state.hasPdf = false;
+  $("bookCard").classList.remove("show");
+  $("trailerBtn").disabled = $("lessonBtn").disabled = true;
+  await newSession();
+  addMsg("buddy", render("Fresh start! ✨ What shall we learn now?"));
+  closeDrawerOnPhone();
+};
+
+document.querySelectorAll(".chip").forEach(c => c.onclick = () => { if (!state.busy) send(c.textContent.trim()); });
+
+$("trailerBtn").disabled = $("lessonBtn").disabled = true;
+init();
+</script>
+</body>
+</html>

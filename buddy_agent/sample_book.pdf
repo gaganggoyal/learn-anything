@@ -1,0 +1,71 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 322 >>
+stream
+BT /F1 12 Tf 50 750 Td 16 TL
+(The Water Cycle - A Little Book) Tj T*
+(Water moves around our planet in a big circle called the water cycle.) Tj T*
+(The sun heats up water in oceans, lakes, and rivers.) Tj T*
+(The warm water turns into an invisible gas called water vapor.) Tj T*
+(This step is called evaporation.) Tj T*
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 246 >>
+stream
+BT /F1 12 Tf 50 750 Td 16 TL
+(High up in the sky, the air is very cold.) Tj T*
+(The water vapor cools down and turns into tiny water drops.) Tj T*
+(The tiny drops stick together and make clouds.) Tj T*
+(This step is called condensation.) Tj T*
+ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 299 >>
+stream
+BT /F1 12 Tf 50 750 Td 16 TL
+(When clouds get heavy, the water falls back down.) Tj T*
+(It can fall as rain, snow, or hail.) Tj T*
+(This step is called precipitation.) Tj T*
+(The water flows back into rivers, lakes, and oceans.) Tj T*
+(Then the whole cycle starts again, around and around!) Tj T*
+ET
+endstream
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000127 00000 n 
+0000000197 00000 n 
+0000000323 00000 n 
+0000000696 00000 n 
+0000000822 00000 n 
+0000001119 00000 n 
+0000001245 00000 n 
+trailer
+<< /Size 10 /Root 1 0 R >>
+startxref
+1595
+%%EOF

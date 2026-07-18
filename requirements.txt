@@ -1,0 +1,7 @@
+# Web layer
+fastapi>=0.110
+uvicorn>=0.29
+python-multipart>=0.0.9
+# Needed by the Buddy agent code this site imports
+ollama>=0.4
+pypdf>=5.0
